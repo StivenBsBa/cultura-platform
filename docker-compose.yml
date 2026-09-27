@@ -159,8 +159,12 @@ services:
       - /bin/sh
       - -c
       - |
-        /usr/bin/rc alias set rustfs http://rustfs:9000 "$${RUSTFS_ACCESS_KEY}" "$${RUSTFS_SECRET_KEY}" --region "$${S3_REGION}" --bucket-lookup path
-        /usr/bin/rc bucket create "rustfs/$${S3_BUCKET}" --ignore-existing
+        set -e
+        until /usr/bin/rc alias set rustfs http://rustfs:9000 "$${RUSTFS_ACCESS_KEY}" "$${RUSTFS_SECRET_KEY}" --region "$${S3_REGION}" --bucket-lookup path; do
+          echo "Waiting for RustFS alias configuration..."
+          sleep 2
+        done
+        /usr/bin/rc ls "rustfs/$${S3_BUCKET}" >/dev/null 2>&1 || /usr/bin/rc bucket create "rustfs/$${S3_BUCKET}"
 
     depends_on:
       rustfs:
