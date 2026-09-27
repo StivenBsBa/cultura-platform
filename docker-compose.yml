@@ -164,7 +164,7 @@ services:
         attempt=1
         max_attempts=20
 
-        until /usr/bin/rc alias set rustfs http://rustfs:9000 "$${RUSTFS_ACCESS_KEY}" "$${RUSTFS_SECRET_KEY}" --region "$${S3_REGION}" --bucket-lookup path; do
+        until /usr/bin/rc alias set rustfs http://rustfs:9000 "$${RUSTFS_ACCESS_KEY}" "$${RUSTFS_SECRET_KEY}"; do
           if [ "$$attempt" -ge "$$max_attempts" ]; then
             echo "RustFS alias configuration failed after $$max_attempts attempts."
             exit 1
