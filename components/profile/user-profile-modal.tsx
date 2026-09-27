@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pencil, Trash2, KeyRound } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
@@ -56,18 +56,10 @@ export function UserProfileModal({
   onDeleted?: (id: string) => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const [draft, setDraft] = useState(user);
+  const [draft, setDraft] = useState<UserRecord>(() => user);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-
-  useEffect(() => {
-    if (!open) return;
-    setDraft(user);
-    setError("");
-    setFieldErrors({});
-    setEditing(false);
-  }, [open, user]);
 
   if (!open) return null;
   const canEdit = self || admin;
