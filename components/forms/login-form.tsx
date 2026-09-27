@@ -4,9 +4,9 @@ import { Eye, EyeOff } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Box, IconButton, Typography } from "@mui/material";
+import { Alert, Box, IconButton, Typography } from "@mui/material";
 import { Button } from "@/components/ui/button";
-import { FieldError, Input } from "@/components/ui/form-field";
+import { FieldError, FormField, Input } from "@/components/ui/form-field";
 export function LoginForm() {
   const [error, setError] = useState("");
   const [show, setShow] = useState(false);
@@ -60,32 +60,33 @@ export function LoginForm() {
         Bienvenido nuevamente
       </Typography>
       {passwordChanged && (
-        <Typography component="p" role="status">
+        <Alert severity="success" role="status">
           Contraseña actualizada. Inicia sesión con tu nueva contraseña.
-        </Typography>
+        </Alert>
       )}
-      <Box component="label" sx={{ display: "grid", gap: 0.75, fontWeight: 600 }}>
-        Email
-        <Input name="email" type="email" autoComplete="email" required />
-      </Box>
-      <Box component="label" sx={{ display: "grid", gap: 0.75, fontWeight: 600 }}>
-        Contraseña
-        <Box sx={{ display: "flex", minWidth: 0 }}>
+      <FormField label="Email" htmlFor="login-email">
+        <Input id="login-email" name="email" type="email" autoComplete="email" required />
+      </FormField>
+      <FormField label="Contraseña" htmlFor="login-password" hint="Usa la contraseña de tu cuenta">
+        <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
           <Input
+            id="login-password"
             name="password"
             type={show ? "text" : "password"}
             autoComplete="current-password"
             required
+            sx={{ borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
           />
           <IconButton
             type="button"
             onClick={() => setShow(!show)}
             aria-label={show ? "Ocultar contraseña" : "Mostrar contraseña"}
+            sx={{ border: "1px solid", borderColor: "divider", borderLeft: 0, borderRadius: "0 8px 8px 0", height: 40 }}
           >
             {show ? <EyeOff size={18} /> : <Eye size={18} />}
           </IconButton>
         </Box>
-      </Box>
+      </FormField>
       {error && <FieldError>{error}</FieldError>}
       <Button type="submit" loading={loading}>Ingresar</Button>
       <Typography component="p" color="text.secondary">

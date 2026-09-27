@@ -24,8 +24,9 @@ export async function createUpload(input: {
   )
     throw new Error("INVALID_FORMAT");
   if (input.size < 1 || input.size > MAX_IMAGE_SIZE) throw new Error("INVALID_SIZE");
+  const folder = input.kind === "CATEGORY" ? "categories" : `${input.kind.toLowerCase()}s`;
   // El propietario siempre forma parte de la key; entityId es solo contexto.
-  const objectKey = `${input.kind.toLowerCase()}s/${input.ownerId}/${input.entityId ?? "unattached"}/${randomUUID()}.${extension}`;
+  const objectKey = `${folder}/${input.ownerId}/${input.entityId ?? "unattached"}/${randomUUID()}.${extension}`;
   return { objectKey, uploadUrl: await createPresignedPut(objectKey, input.mimeType) };
 }
 export const verifyUploadedObject = objectExists;

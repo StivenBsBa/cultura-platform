@@ -5,6 +5,7 @@ import { EntityCard, EntityGrid, StatusBadge } from "@/components/ui/entity-card
 import { EmptyState } from "@/components/ui/empty-state";
 import { SearchInput } from "@/components/ui/search-input";
 import { Avatar, Box, Paper, Typography } from "@mui/material";
+import { formatRoleLabel } from "@/lib/utils/user-role";
 type User = {
   id: string;
   name: string;
@@ -51,9 +52,9 @@ export function UsersTable({ initial }: { initial: User[] }) {
             <Typography component="h3" variant="h6">
               {user.name}
             </Typography>
-            <Typography className="entity-card-summary">{user.email}</Typography>
-            <StatusBadge>{user.role}</StatusBadge>
-            <Typography className="entity-card-meta">
+            <Typography sx={{ color: "text.secondary", m: 0 }}>{user.email}</Typography>
+            <StatusBadge>{formatRoleLabel(user.role)}</StatusBadge>
+            <Typography sx={{ color: "text.secondary", fontSize: "0.86rem" }}>
               Registro:{" "}
               {new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(
                 new Date(user.createdAt),

@@ -4,20 +4,22 @@ import { NextLinkAdapter } from "@/components/ui/next-link-adapter";
 export function SiteFooter() {
   return (
     <Box component="footer" sx={{ bgcolor: "#153c32", color: "#e9f1eb" }}>
-      <PageContainer sx={{ pt: 8, pb: 2.5 }}>
+      <PageContainer sx={{ pt: { xs: 5, md: 8 }, pb: 2.5 }}>
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", md: "1.2fr repeat(3, minmax(0, 1fr))" },
             gap: 3,
             mb: 3,
           }}
         >
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Box component="strong" sx={{ fontWeight: 700 }}>
               Cultura Platform
             </Box>
-            <Box component="p">Descubre cultura, eventos y lugares.</Box>
+            <Box component="p" sx={{ my: 1.25, maxWidth: 260 }}>
+              Descubre cultura, eventos y lugares.
+            </Box>
           </Box>
           <FooterNav
             label="Explorar"
@@ -44,7 +46,9 @@ export function SiteFooter() {
             ]}
           />
         </Box>
-        <Box component="small">© {new Date().getFullYear()} Cultura Platform</Box>
+        <Box component="small" sx={{ display: "block", opacity: 0.8 }}>
+          © {new Date().getFullYear()} Cultura Platform
+        </Box>
       </PageContainer>
     </Box>
   );

@@ -1,11 +1,11 @@
 import { EventCard } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
 import { eventService } from "@/lib/services/event.service";
+import { categoryService } from "@/lib/services/category.service";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Box } from "@mui/material";
 import { Typography } from "@mui/material";
 import { PageContainer } from "@/components/ui/page-container";
-import { SlidersHorizontal } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -15,22 +15,31 @@ export default async function EventsPage({
   searchParams: Promise<Record<string, string | undefined>>;
 }) {
   const query = await searchParams;
-  const { data } = await eventService.list({
-    page: 1,
-    pageSize: 20,
-    sort: "upcoming",
-    search: query.search,
-    category: query.category,
-    period: query.period as "today" | "weekend" | "next_7_days" | undefined,
-    free: query.free === "true",
-  });
+  const [categories, { data }] = await Promise.all([
+    categoryService.list("EVENT"),
+    eventService.list({
+      page: 1,
+      pageSize: 20,
+      sort: "upcoming",
+      search: query.search,
+      category: query.category,
+      period: query.period as "today" | "weekend" | "next_7_days" | undefined,
+      free: query.free === "true",
+    }),
+  ]);
   return (
     <>
       <PageContainer component="main">
         <Typography component="h1" variant="h3" sx={{ mb: 2 }}>
           Eventos culturales
         </Typography>
-        <EventFilters search={query.search} period={query.period} free={query.free === "true"} />
+        <EventFilters
+          search={query.search}
+          period={query.period}
+          category={query.category}
+          categories={categories}
+          free={query.free === "true"}
+        />
         <Box
           sx={{
             display: "grid",

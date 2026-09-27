@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/form-field";
+import { FormField, Input } from "@/components/ui/form-field";
 import {
   LocationAutocomplete,
   type LocationResult,
@@ -39,7 +39,7 @@ export function PlaceFormFields({
           placeholder="Buscar dirección, POI o municipio"
         />
       </Box>
-      <Field label="Dirección">
+      <Field label="Dirección" hint="Dirección exacta que se mostrará al público">
         <Input
           name="address"
           required
@@ -47,7 +47,7 @@ export function PlaceFormFields({
           onChange={(event) => onAddress(event.target.value)}
         />
       </Field>
-      <Field label="Ciudad ID">
+      <Field label="Ciudad ID" hint="Identificador interno de la ciudad">
         <Input
           name="cityId"
           required
@@ -110,11 +110,10 @@ export function PlaceFormFields({
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <Box component="label" sx={{ display: "grid", gap: 0.75, fontWeight: 600 }}>
-      {label}
+    <FormField label={label} htmlFor={typeof children === "object" && children !== null && "props" in children ? String((children as { props?: { name?: string } }).props?.name ?? label) : label} hint={hint}>
       {children}
-    </Box>
+    </FormField>
   );
 }

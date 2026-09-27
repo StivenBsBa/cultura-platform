@@ -13,7 +13,7 @@ import { PlaceFormFields } from "@/components/admin/place-form-fields";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { Input, Select, Textarea } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
-import { Box, Chip, MenuItem, Typography } from "@mui/material";
+import { Alert, Box, Chip, MenuItem, Typography } from "@mui/material";
 import { ActionGroup } from "@/components/ui/entity-card";
 import { Modal } from "@/components/ui/modal";
 type Props = {
@@ -143,12 +143,12 @@ export function ContentForm({
     const body =
       kind === "event"
         ? {
-            ...common,
-            price: Number(form.get("price")),
-            capacity: form.get("capacity") ? Number(form.get("capacity")) : undefined,
-            placeId: form.get("placeId"),
-            occurrences,
-          }
+          ...common,
+          price: Number(form.get("price")),
+          capacity: form.get("capacity") ? Number(form.get("capacity")) : undefined,
+          placeId: form.get("placeId"),
+          occurrences,
+        }
         : common;
     try {
       const resource = kind === "event" ? "events" : "places";
@@ -193,7 +193,10 @@ export function ContentForm({
     <Box
       component="form"
       ref={formRef}
-      action={submit}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submit(new FormData(event.currentTarget));
+      }}
       sx={{
         width: "min(100%, 760px)",
         mx: "auto",
@@ -226,18 +229,22 @@ export function ContentForm({
           defaultValue={initial?.summary ?? ""}
         />
       </Box>
-      <div>
-        <p className="field-label">Contenido enriquecido</p>
+      <Box sx={{ display: "grid", gap: 1 }}>
+        <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+          Contenido enriquecido
+        </Typography>
         <RichTextEditor
           key={editorKey}
           initialContent={initial?.content}
           kind={kind === "event" ? "EVENT" : "PLACE"}
           onChange={setContent}
         />
-      </div>
+      </Box>
       <input type="hidden" name="content" value={JSON.stringify(content)} readOnly />
-      <div>
-        <p className="field-label">Imagen principal</p>
+      <Box sx={{ display: "grid", gap: 1 }}>
+        <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+          Imagen principal
+        </Typography>
         <ImageUploader
           key={uploaderKey}
           kind={kind === "event" ? "EVENT" : "PLACE"}
@@ -266,7 +273,7 @@ export function ContentForm({
             </Button>
           </ActionGroup>
         )}
-      </div>
+      </Box>
       {kind === "event" ? (
         <EventFormFields
           places={places}
@@ -317,12 +324,18 @@ export function ContentForm({
           {initial?.status === "ARCHIVED" && <MenuItem value="ARCHIVED">Archivado</MenuItem>}
         </Select>
       </Box>
-      {feedback && <p role="alert">{feedback}</p>}
+      {feedback && (
+        <Alert severity="error" role="alert">
+          {feedback}
+        </Alert>
+      )}
       <ActionGroup>
         <Button type="button" variant="outline" onClick={() => setPreviewOpen(true)}>
           Vista previa
         </Button>
-        <Button loading={loading}>{initial ? "Actualizar" : "Guardar"}</Button>
+        <Button type="submit" loading={loading}>
+          {initial ? "Actualizar" : "Guardar"}
+        </Button>
       </ActionGroup>
       {previewOpen && (
         <Modal title="Vista previa" onClose={() => setPreviewOpen(false)} size="lg">

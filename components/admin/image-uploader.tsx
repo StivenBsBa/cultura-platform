@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ActionGroup } from "@/components/ui/entity-card";
-import { Box, Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Alert, Box, Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 const types = ["image/jpeg", "image/png", "image/webp"];
 const OUTPUT_SIZE = 512;
 export function ImageUploader({
@@ -16,6 +16,7 @@ export function ImageUploader({
 }) {
   const [preview, setPreview] = useState("");
   const [status, setStatus] = useState("");
+  const [statusTone, setStatusTone] = useState<"success" | "error" | "info">("info");
   const [cropSrc, setCropSrc] = useState("");
   const [zoom, setZoom] = useState(1);
   const [offsetX, setOffsetX] = useState(0);
@@ -52,17 +53,18 @@ export function ImageUploader({
   }, [source, zoom, offsetX, offsetY]);
   const limits = source
     ? (() => {
-        const scale =
-          Math.max(OUTPUT_SIZE / source.naturalWidth, OUTPUT_SIZE / source.naturalHeight) * zoom;
-        return {
-          x: Math.max(0, (source.naturalWidth * scale - OUTPUT_SIZE) / 2),
-          y: Math.max(0, (source.naturalHeight * scale - OUTPUT_SIZE) / 2),
-        };
-      })()
+      const scale =
+        Math.max(OUTPUT_SIZE / source.naturalWidth, OUTPUT_SIZE / source.naturalHeight) * zoom;
+      return {
+        x: Math.max(0, (source.naturalWidth * scale - OUTPUT_SIZE) / 2),
+        y: Math.max(0, (source.naturalHeight * scale - OUTPUT_SIZE) / 2),
+      };
+    })()
     : { x: 0, y: 0 };
   async function upload(file: File) {
     setUploading(true);
     setStatus("Subiendo…");
+    setStatusTone("info");
     try {
       const presign = await fetch("/api/v1/uploads/presign", {
         method: "POST",
@@ -87,27 +89,35 @@ export function ImageUploader({
       const complete = await fetch("/api/v1/uploads/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objectKey: presignResult.data.objectKey }),
+        body: JSON.stringify({
+          objectKey: presignResult.data.objectKey,
+          alt: file.name.replace(/\.[^.]+$/, "") || "Imagen subida",
+        }),
       });
       const result = await complete.json().catch(() => null);
       if (!complete.ok)
         throw new Error(result?.error?.message ?? "No fue posible registrar la imagen.");
       setPreview(result.data.url);
       setStatus("Imagen subida correctamente.");
+      setStatusTone("success");
       onUploaded?.(result.data.url, result.data.id);
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "No fue posible subir la imagen.");
+      setStatusTone("error");
     } finally {
       setUploading(false);
     }
   }
   function select(file: File) {
+    setStatus("");
     if (!types.includes(file.type)) {
       setStatus("Formato no permitido. Usa JPG, PNG o WebP.");
+      setStatusTone("error");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       setStatus("La imagen no puede superar 5 MB.");
+      setStatusTone("error");
       return;
     }
     // Solo el avatar requiere composición cuadrada. Las portadas conservan su
@@ -177,11 +187,15 @@ export function ImageUploader({
           }}
         />
       )}
-      {status && <p role="status">{status}</p>}
+      {status && (
+        <Alert severity={statusTone} role="status" aria-live="polite">
+          {status}
+        </Alert>
+      )}
       {cropSrc && (
         <Dialog
           open
-          onClose={() => {}}
+          onClose={() => { }}
           maxWidth={false}
           slotProps={{ paper: { sx: { width: "min(100% - 2rem, 500px)" } } }}
         >
@@ -219,9 +233,9 @@ export function ImageUploader({
                   setZoom(nextZoom);
                   const scale = source
                     ? Math.max(
-                        OUTPUT_SIZE / source.naturalWidth,
-                        OUTPUT_SIZE / source.naturalHeight,
-                      ) * nextZoom
+                      OUTPUT_SIZE / source.naturalWidth,
+                      OUTPUT_SIZE / source.naturalHeight,
+                    ) * nextZoom
                     : 1;
                   const nextX = source
                     ? Math.max(0, (source.naturalWidth * scale - OUTPUT_SIZE) / 2)

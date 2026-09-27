@@ -1,8 +1,12 @@
 "use client";
 
 import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
-import { FormHelperText, OutlinedInput, Select as MuiSelect } from "@mui/material";
+import { Box, FormHelperText, OutlinedInput, Select as MuiSelect, Typography } from "@mui/material";
 import type { SelectProps } from "@mui/material/Select";
+
+type TextareaProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "color" | "size"> & {
+  sx?: object;
+};
 
 export function FormField({
   label,
@@ -18,22 +22,37 @@ export function FormField({
   children: ReactNode;
 }) {
   return (
-    <label className="form-field" htmlFor={htmlFor}>
-      {label}
+    <Box component="label" htmlFor={htmlFor} sx={{ display: "grid", gap: 0.75, width: "100%" }}>
+      <Box component="span" sx={{ fontWeight: 500 }}>
+        {label}
+      </Box>
       {children}
-      {hint && <small className="field-hint">{hint}</small>}
+      {hint && (
+        <Typography component="small" variant="caption" sx={{ color: "text.secondary" }}>
+          {hint}
+        </Typography>
+      )}
       {error && <FieldError>{error}</FieldError>}
-    </label>
+    </Box>
   );
 }
-export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
-  return <OutlinedInput fullWidth size="small" className={className} inputProps={props} />;
+export function Input({ className, sx, ...props }: Omit<InputHTMLAttributes<HTMLInputElement>, "color" | "size"> & { sx?: object }) {
+  return <OutlinedInput fullWidth size="small" className={className} sx={sx} {...props} />;
 }
-export function Textarea({ className, ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <OutlinedInput fullWidth multiline minRows={3} className={className} inputProps={props} />;
+export function Textarea({ className, sx, rows, ...props }: TextareaProps) {
+  return (
+    <OutlinedInput
+      fullWidth
+      multiline
+      minRows={rows ?? 3}
+      className={className}
+      sx={sx}
+      {...(props as Record<string, unknown>)}
+    />
+  );
 }
-export function Select({ className, ...props }: Omit<SelectProps<string>, "size">) {
-  return <MuiSelect fullWidth size="small" variant="outlined" className={className} {...props} />;
+export function Select({ className, sx, ...props }: Omit<SelectProps<string>, "size"> & { className?: string; sx?: object }) {
+  return <MuiSelect fullWidth size="small" variant="outlined" className={className} sx={sx} {...props} />;
 }
 export function FieldError({ children }: { children: ReactNode }) {
   return (

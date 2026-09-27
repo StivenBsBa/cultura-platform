@@ -229,13 +229,17 @@ export function ModerationEventTable({ initial }: { initial: EventRow[] }) {
               <dd>{selected.status}</dd>
             </div>
           </Box>
-          <p className="field-label">Categorías</p>
+          <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+            Categorías
+          </Typography>
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.75 }}>
             {selected.categories.map(({ category }) => (
               <Chip key={category.name} label={category.name} size="small" color="secondary" />
             ))}
           </Box>
-          <p className="field-label">Ocurrencias</p>
+          <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+            Ocurrencias
+          </Typography>
           <ul>
             {selected.occurrences.map((occurrence) => (
               <li key={occurrence.startsAt}>
@@ -251,7 +255,9 @@ export function ModerationEventTable({ initial }: { initial: EventRow[] }) {
               </li>
             ))}
           </ul>
-          <p className="field-label">Contenido</p>
+          <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+            Contenido
+          </Typography>
           <RichTextRenderer content={selected.content as never} />
           <ActionGroup>
             {editing ? (

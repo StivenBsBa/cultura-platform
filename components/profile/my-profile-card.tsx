@@ -4,6 +4,7 @@ import { UserProfileModal } from "./user-profile-modal";
 import { Button } from "@/components/ui/button";
 import { Avatar, Box, Paper, Typography } from "@mui/material";
 import { CalendarDays, Heart, MapPin, Pencil, ShieldCheck, TicketCheck } from "lucide-react";
+import { formatRoleLabel } from "@/lib/utils/user-role";
 type User = {
   id: string;
   name: string;
@@ -87,7 +88,7 @@ export function MyProfileCard({
                     fontWeight: 700,
                   }}
                 >
-                  {user.role}
+                  {formatRoleLabel(user.role)}
                 </Typography>
                 <Box
                   sx={{ display: "flex", alignItems: "center", gap: 0.75, color: "text.secondary" }}

@@ -85,11 +85,11 @@ export function MediaGrid({ initial }: { initial: Media[] }) {
               }}
             />
             <h3>{item.alt || "Imagen sin descripción"}</h3>
-            <Typography className="entity-card-summary">
+            <Typography sx={{ color: "text.secondary", m: 0 }}>
               {item.owner.name || item.owner.email}
             </Typography>
             <StatusBadge>{item.provider}</StatusBadge>
-            <Typography className="entity-card-meta">
+            <Typography sx={{ color: "text.secondary", fontSize: "0.86rem" }}>
               {new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(
                 new Date(item.createdAt),
               )}

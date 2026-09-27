@@ -56,6 +56,19 @@ export function RichTextEditor({
       </Typography>
     );
   const editorInstance = editor;
+
+  function toggleLink() {
+    if (!editorInstance) return;
+    const current = editorInstance.getAttributes("link")?.href as string | undefined;
+    const href = window.prompt("URL del enlace", current ?? "https://");
+    if (!href) {
+      editorInstance.chain().focus().unsetLink().run();
+      return;
+    }
+    const normalized = /^https?:\/\//i.test(href) || /^mailto:/i.test(href) ? href : `https://${href}`;
+    editorInstance.chain().focus().setLink({ href: normalized, target: "_blank", rel: "noreferrer" }).run();
+  }
+
   async function uploadImage(file: File) {
     if (!/image\/(jpeg|png|webp)/.test(file.type)) {
       setError("Formato no permitido. Usa JPG, PNG o WebP.");
@@ -86,7 +99,10 @@ export function RichTextEditor({
       const completeResponse = await fetch("/api/v1/uploads/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objectKey: prepared.data.objectKey, alt: file.name }),
+        body: JSON.stringify({
+          objectKey: prepared.data.objectKey,
+          alt: file.name.replace(/\.[^.]+$/, "") || "Imagen subida",
+        }),
       });
       const completed = await completeResponse.json().catch(() => null);
       if (!completeResponse.ok || !completed.data?.id)
@@ -110,8 +126,8 @@ export function RichTextEditor({
     <Paper
       variant="outlined"
       sx={{
-        borderColor: "#d7e2dc",
-        borderRadius: 1,
+        borderColor: "divider",
+        borderRadius: 2,
         overflow: "hidden",
         bgcolor: "background.paper",
       }}
@@ -120,9 +136,11 @@ export function RichTextEditor({
         sx={{
           display: "flex",
           flexWrap: "wrap",
-          gap: 0.5,
+          gap: 0.75,
           p: 1,
-          borderBottom: "1px solid #d7e2dc",
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          bgcolor: "action.hover",
         }}
       >
         <Button
@@ -151,6 +169,24 @@ export function RichTextEditor({
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         >
           H2
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          sx={toolbarButtonSx}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        >
+          H3
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          sx={toolbarButtonSx}
+          onClick={toggleLink}
+        >
+          Enlace
         </Button>
         <Button
           type="button"
@@ -192,15 +228,36 @@ export function RichTextEditor({
           }}
         />
       </Box>
-      <Typography component="p" color="text.secondary">
+      <Typography component="p" sx={{ m: 0, px: 1.5, pt: 1.25, color: "text.secondary" }}>
         Formatos permitidos: JPG, PNG y WebP. Tamaño máximo: 5 MB.
       </Typography>
       {error && (
-        <Alert severity="error" role="alert">
+        <Alert severity="error" role="alert" sx={{ mx: 1.5, mt: 1.25 }}>
           {error}
         </Alert>
       )}
-      <Box sx={{ "& .tiptap": { minHeight: 180, p: 1.5, outline: "none" } }}>
+      <Box
+        sx={{
+          px: 1.5,
+          pb: 1.5,
+          "& .ProseMirror": {
+            minHeight: 220,
+            p: 1.5,
+            border: "1px solid",
+            borderColor: "divider",
+            borderRadius: 1,
+            outline: "none",
+            bgcolor: "background.default",
+            transition: "border-color 120ms ease, box-shadow 120ms ease",
+          },
+          "& .ProseMirror:focus": {
+            borderColor: "primary.main",
+            boxShadow: "0 0 0 2px rgba(25, 118, 210, 0.12)",
+          },
+          "& .ProseMirror p": { my: 0.6 },
+          "& .ProseMirror img": { display: "block", maxWidth: "100%", height: "auto", borderRadius: 1.5, my: 1 },
+        }}
+      >
         <EditorContent editor={editor} />
       </Box>
     </Paper>

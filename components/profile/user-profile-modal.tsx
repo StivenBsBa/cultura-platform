@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { Pencil, Trash2, UserRound, KeyRound } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Pencil, Trash2, KeyRound } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import { z } from "zod";
@@ -8,8 +8,9 @@ import { ImageUploader } from "@/components/admin/image-uploader";
 import { Modal } from "@/components/ui/modal";
 import { Input, Select } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
-import { Alert, Avatar, Box, Chip, FormHelperText, MenuItem } from "@mui/material";
+import { Alert, Avatar, Box, Chip, FormHelperText, MenuItem, Typography } from "@mui/material";
 import { ActionGroup } from "@/components/ui/entity-card";
+import { formatRoleLabel } from "@/lib/utils/user-role";
 type UserRecord = {
   id: string;
   name: string;
@@ -59,16 +60,32 @@ export function UserProfileModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+
+  useEffect(() => {
+    if (!open) return;
+    setDraft(user);
+    setError("");
+    setFieldErrors({});
+    setEditing(false);
+  }, [open, user]);
+
   if (!open) return null;
   const canEdit = self || admin;
   const canDelete = admin && !self;
+  const initials = (draft.name || "U")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => word[0]?.toUpperCase() ?? "")
+    .slice(0, 2)
+    .join("") || "U";
   function cancel() {
     setDraft(user);
     setError("");
     setFieldErrors({});
     setEditing(false);
   }
-  async function save() {
+  async function save(event?: React.FormEvent) {
+    event?.preventDefault();
     const parsed = (self ? selfEditorSchema : adminEditorSchema).safeParse(draft);
     if (!parsed.success) {
       const next: FieldErrors = {};
@@ -88,12 +105,12 @@ export function UserProfileModal({
     const body = self
       ? { name: data.name, image: data.image || null }
       : {
-          userId: user.id,
-          name: data.name,
-          email: data.email.trim().toLowerCase(),
-          role: data.role,
-          image: data.image || null,
-        };
+        userId: user.id,
+        name: data.name,
+        email: data.email.trim().toLowerCase(),
+        role: data.role,
+        image: data.image || null,
+      };
     try {
       const response = await fetch(self ? "/api/v1/users/me" : "/api/v1/admin/users", {
         method: "PATCH",
@@ -197,21 +214,31 @@ export function UserProfileModal({
       <Avatar
         src={draft.image ?? undefined}
         alt="Avatar"
-        sx={{ width: 72, height: 72, mb: 2, bgcolor: "secondary.main" }}
+        sx={{ width: 72, height: 72, mb: 2, bgcolor: "secondary.main", fontWeight: 700 }}
       >
-        <UserRound size={30} />
+        {draft.image ? null : initials}
       </Avatar>
       {editing ? (
-        <div className="modal-fields">
+        <Box
+          id="user-profile-edit-form"
+          component="form"
+          noValidate
+          onSubmit={(event) => {
+            event.preventDefault();
+            void save(event);
+          }}
+          sx={{ display: "grid", gap: 1.5 }}
+        >
           <label>
             Nombre
             <Input
               autoFocus
+              required
               value={draft.name}
               aria-invalid={Boolean(fieldErrors.name)}
               onChange={(event) => {
                 setDraft({ ...draft, name: event.target.value });
-                setFieldErrors({ ...fieldErrors, name: undefined });
+                setFieldErrors((current) => ({ ...current, name: undefined }));
               }}
             />
           </label>
@@ -221,11 +248,12 @@ export function UserProfileModal({
               Correo
               <Input
                 type="email"
+                required
                 value={draft.email}
                 aria-invalid={Boolean(fieldErrors.email)}
                 onChange={(event) => {
                   setDraft({ ...draft, email: event.target.value });
-                  setFieldErrors({ ...fieldErrors, email: undefined });
+                  setFieldErrors((current) => ({ ...current, email: undefined }));
                 }}
               />
             </label>
@@ -239,7 +267,7 @@ export function UserProfileModal({
                 aria-invalid={Boolean(fieldErrors.role)}
                 onChange={(event) => {
                   setDraft({ ...draft, role: event.target.value });
-                  setFieldErrors({ ...fieldErrors, role: undefined });
+                  setFieldErrors((current) => ({ ...current, role: undefined }));
                 }}
               >
                 {roles.map((role) => (
@@ -251,16 +279,18 @@ export function UserProfileModal({
             </label>
           )}
           {admin && fieldErrors.role && <FormHelperText error>{fieldErrors.role}</FormHelperText>}
-          <div>
-            <p className="field-label">Avatar</p>
+          <Box sx={{ display: "grid", gap: 1 }}>
+            <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
+              Avatar
+            </Typography>
             <ImageUploader
               kind="USER"
               entityId={draft.id}
-              onUploaded={(url) => setDraft({ ...draft, image: url })}
+              onUploaded={(url) => setDraft((current) => ({ ...current, image: url }))}
             />
             {fieldErrors.image && <FormHelperText error>{fieldErrors.image}</FormHelperText>}
-          </div>
-        </div>
+          </Box>
+        </Box>
       ) : (
         <Box
           component="dl"
@@ -272,7 +302,7 @@ export function UserProfileModal({
           <dd>{draft.email}</dd>
           <dt>Rol</dt>
           <dd>
-            <Chip label={draft.role} size="small" color="secondary" />
+            <Chip label={formatRoleLabel(draft.role)} size="small" color="secondary" />
           </dd>
           <dt>Registro</dt>
           <dd>
@@ -293,7 +323,7 @@ export function UserProfileModal({
             <Button variant="ghost" type="button" onClick={cancel} disabled={loading}>
               Cancelar
             </Button>
-            <Button type="button" onClick={() => void save()} loading={loading}>
+            <Button type="submit" form="user-profile-edit-form" loading={loading}>
               Guardar
             </Button>
           </>

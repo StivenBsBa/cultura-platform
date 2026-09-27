@@ -1,4 +1,5 @@
 import type { JSONContent } from "@tiptap/core";
+import { Box } from "@mui/material";
 import type { ReactNode } from "react";
 import { isMediaId, mediaObjectUrl } from "@/lib/content/rich-text-media";
 
@@ -7,11 +8,20 @@ const validSizes = new Set(["small", "medium", "large", "full"]);
 export function RichTextRenderer({ content }: { content?: JSONContent | null }) {
   if (!content?.content) return null;
   return (
-    <div className="rich-content">
+    <Box
+      component="div"
+      sx={{
+        "& img": { display: "block", maxWidth: "100%", height: "auto", borderRadius: 2, my: 1.5 },
+        "& p, & ul, & ol, & blockquote, & h2, & h3": { my: 1.5 },
+        "& ul, & ol": { pl: 3 },
+        "& a": { color: "primary.main", textDecoration: "underline" },
+        "& figure": { my: 2.5 },
+      }}
+    >
       {content.content.map((node, index) => (
         <NodeView key={index} node={node} />
       ))}
-    </div>
+    </Box>
   );
 }
 function NodeView({ node }: { node: JSONContent }) {
@@ -68,10 +78,19 @@ function MediaFigure({ node }: { node: JSONContent }) {
   const alt = typeof node.attrs?.alt === "string" ? node.attrs.alt : "";
   const caption = typeof node.attrs?.caption === "string" ? node.attrs.caption : "";
   return (
-    <figure className={`rich-media rich-media--${align} rich-media--${size}`}>
-      <img src={mediaObjectUrl(mediaId)} alt={alt} />
-      {caption && <figcaption>{caption}</figcaption>}
-    </figure>
+    <Box
+      component="figure"
+      sx={{
+        mx: align === "left" ? 0 : align === "right" ? "auto" : "auto",
+        my: 2.5,
+        maxWidth: size === "small" ? "33%" : size === "medium" ? "66%" : "100%",
+        width: "100%",
+        ...(align === "left" ? { ml: 0, mr: "auto" } : align === "right" ? { mr: 0, ml: "auto" } : {}),
+      }}
+    >
+      <Box component="img" src={mediaObjectUrl(mediaId)} alt={alt} sx={{ display: "block", width: "100%", height: "auto", borderRadius: 2 }} />
+      {caption && <Box component="figcaption" sx={{ mt: 1, color: "text.secondary", fontSize: "0.9rem" }}>{caption}</Box>}
+    </Box>
   );
 }
 

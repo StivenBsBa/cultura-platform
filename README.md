@@ -33,7 +33,7 @@ npm run db:seed
 npm run dev
 ```
 
-Abra http://localhost:3000. Para ejecutar todo con Docker:
+Para desarrollo local desde host, abre http://localhost:3000. Para ejecutar todo con Docker y acceder a la app pública, usa http://localhost:7120:
 
 ```bash
 docker compose up -d --build
@@ -55,7 +55,7 @@ Copie `.env.example`; no suba `.env`.
 | `RUN_DB_SEED`                 | No                    | Habilita seed durante bootstrap               | Externa: omitido por defecto; `true` lo ejecuta                  |
 | `AUTH_SECRET`                 | Sí                    | Secreto Auth.js                               | `openssl rand -base64 48`                                        |
 | `NEXTAUTH_SECRET`             | No                    | Alternativa con prioridad sobre `AUTH_SECRET` | secreto compatible                                               |
-| `AUTH_URL`                    | Recomendado           | URL usada por layout, sitemap y robots        | `http://localhost:3000`                                          |
+| `AUTH_URL`                    | Recomendado           | URL usada por layout, sitemap y robots        | `http://localhost:7120`                                          |
 | `NEXTAUTH_URL`                | Sí                    | URL canónica de callbacks de NextAuth.js v4   | igual a `AUTH_URL`                                               |
 | `REDIS_URL`                   | Recomendado           | Caché, rate limits y colas                    | `redis://localhost:6379`                                         |
 | `S3_ENDPOINT`                 | Sí para uploads       | Endpoint servidor → RustFS                    | host: `http://localhost:9000`; Docker: `http://rustfs:9000`      |
@@ -65,7 +65,7 @@ Copie `.env.example`; no suba `.env`.
 | `S3_ACCESS_KEY_ID`            | Sí                    | Access key RustFS/aplicación                  | valor aleatorio                                                  |
 | `S3_SECRET_ACCESS_KEY`        | Sí                    | Secret key RustFS/aplicación                  | valor aleatorio                                                  |
 | `S3_FORCE_PATH_STYLE`         | Sí                    | Compatibilidad RustFS                         | `true`                                                           |
-| `RUSTFS_CORS_ALLOWED_ORIGINS` | Compose               | Orígenes para PUT directo                     | `http://localhost:3000`                                          |
+| `RUSTFS_CORS_ALLOWED_ORIGINS` | Compose               | Orígenes para PUT directo                     | `http://localhost:7120`                                          |
 | `RUSTFS_DATA_DIR`             | Compose               | Directorio host para RustFS                   | `/srv/cultura-platform/rustfs`                                   |
 | `GEOAPIFY_API_KEY`            | Opcional              | Direcciones, POI y reverse geocoding          | key Geoapify                                                     |
 | `GEOAPIFY_BASE_URL`           | No                    | Base Geoapify                                 | `https://api.geoapify.com`                                       |
@@ -82,8 +82,8 @@ POSTGRES_USER="cultura"
 POSTGRES_PASSWORD="CAMBIA_ESTE_SECRETO"
 DATABASE_URL="postgresql://cultura:CAMBIA_ESTE_SECRETO@localhost:5432/cultura_platform?schema=public"
 AUTH_SECRET="GENERA_UN_SECRETO_LARGO"
-AUTH_URL="http://localhost:3000"
-NEXTAUTH_URL="http://localhost:3000"
+AUTH_URL="http://localhost:7120"
+NEXTAUTH_URL="http://localhost:7120"
 REDIS_URL="redis://localhost:6379"
 S3_ENDPOINT="http://localhost:9000"
 S3_PUBLIC_ENDPOINT="http://localhost:9000"
@@ -92,7 +92,7 @@ S3_BUCKET="cultura-media"
 S3_ACCESS_KEY_ID="RUSTFS_ACCESS_KEY_SEGURA"
 S3_SECRET_ACCESS_KEY="RUSTFS_SECRET_KEY_SEGURA"
 S3_FORCE_PATH_STYLE="true"
-RUSTFS_CORS_ALLOWED_ORIGINS="http://localhost:3000"
+RUSTFS_CORS_ALLOWED_ORIGINS="http://localhost:7120"
 RUSTFS_DATA_DIR="/srv/cultura-platform/rustfs"
 GEOAPIFY_API_KEY=""
 GEOAPIFY_BASE_URL="https://api.geoapify.com"
@@ -119,7 +119,7 @@ Docker entrega `GEOAPIFY_API_KEY` y `GEOAPIFY_BASE_URL` al contenedor `app`; rei
 
 ## Docker
 
-Servicios: `app` (3000), `postgres`, `redis`, `rustfs` y `bootstrap`.
+Servicios: `app` (7120), `postgres`, `redis`, `rustfs` y `bootstrap`.
 
 ```bash
 docker compose up -d postgres redis rustfs

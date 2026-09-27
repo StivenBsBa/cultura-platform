@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Input, Select } from "@/components/ui/form-field";
+import { FormField, Input, Select } from "@/components/ui/form-field";
 import { Box, MenuItem, Paper, Typography } from "@mui/material";
 import type { ReactNode } from "react";
 export type OccurrenceDraft = { id?: string; startsAt: string; endsAt: string; timezone: string };
@@ -15,8 +15,8 @@ const empty = (): OccurrenceDraft => ({ startsAt: "", endsAt: "", timezone: "Ame
 const dateValue = (value: string) =>
   value
     ? new Date(new Date(value).getTime() - new Date(value).getTimezoneOffset() * 60_000)
-        .toISOString()
-        .slice(0, 16)
+      .toISOString()
+      .slice(0, 16)
     : "";
 export function EventFormFields({
   places,
@@ -28,7 +28,7 @@ export function EventFormFields({
 }: Props) {
   return (
     <>
-      <Field label="Lugar">
+      <Field label="Lugar" hint="Selecciona el espacio donde se celebrará el evento">
         <Select name="placeId" required defaultValue={placeId}>
           <MenuItem value="">Selecciona un lugar</MenuItem>
           {places.map((place) => (
@@ -38,10 +38,10 @@ export function EventFormFields({
           ))}
         </Select>
       </Field>
-      <Field label="Precio">
+      <Field label="Precio" hint="Usa 0 para eventos gratuitos">
         <Input name="price" type="number" min="0" step="0.01" defaultValue={price ?? "0"} />
       </Field>
-      <Field label="Capacidad">
+      <Field label="Capacidad" hint="Opcional si el evento es abierto">
         <Input name="capacity" type="number" min="1" defaultValue={capacity ?? ""} />
       </Field>
       <Box component="section" aria-label="Fechas del evento" sx={{ display: "grid", gap: 1.5 }}>
@@ -139,11 +139,10 @@ export function EventFormFields({
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
-    <Box component="label" sx={{ display: "grid", gap: 0.75, fontWeight: 600 }}>
-      {label}
+    <FormField label={label} htmlFor={typeof children === "object" && children !== null && "props" in children ? String((children as { props?: { name?: string } }).props?.name ?? label) : label} hint={hint}>
       {children}
-    </Box>
+    </FormField>
   );
 }

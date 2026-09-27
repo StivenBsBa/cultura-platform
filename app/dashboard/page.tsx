@@ -10,19 +10,20 @@ import { mediaRepository } from "@/lib/repositories/media.repository";
 import { Box, Link as MuiLink, Typography } from "@mui/material";
 import { PageContainer } from "@/components/ui/page-container";
 import { NextLinkAdapter } from "@/components/ui/next-link-adapter";
+import { formatRoleLabel } from "@/lib/utils/user-role";
 export default async function DashboardPage() {
   const user = await requireUser();
   const showSummary = canManageUsers(user) || canModerate(user) || canCreateContent(user);
   const summary = showSummary
     ? await Promise.all([
-        userRepository.count(),
-        eventRepository.countAll(),
-        placeRepository.countAll(),
-        eventRepository.countPending(),
-        placeRepository.countPending(),
-        canManageUsers(user) ? categoryService.list() : Promise.resolve([]),
-        canManageUsers(user) ? mediaRepository.list() : Promise.resolve([]),
-      ])
+      userRepository.count(),
+      eventRepository.countAll(),
+      placeRepository.countAll(),
+      eventRepository.countPending(),
+      placeRepository.countPending(),
+      canManageUsers(user) ? categoryService.list() : Promise.resolve([]),
+      canManageUsers(user) ? mediaRepository.list() : Promise.resolve([]),
+    ])
     : null;
   return (
     <PageContainer component="main" sx={{ py: 5 }}>
@@ -30,7 +31,7 @@ export default async function DashboardPage() {
         Hola
       </Typography>
       <Typography component="p" color="text.secondary">
-        Rol: {user.role}
+        Rol: {formatRoleLabel(user.role)}
       </Typography>
       {summary && (
         <>
@@ -41,12 +42,12 @@ export default async function DashboardPage() {
             cards={[
               ...(canManageUsers(user)
                 ? [
-                    {
-                      label: "Usuarios",
-                      value: summary[0],
-                      href: "/dashboard/gestion/usuarios",
-                    },
-                  ]
+                  {
+                    label: "Usuarios",
+                    value: summary[0],
+                    href: "/dashboard/gestion/usuarios",
+                  },
+                ]
                 : []),
               {
                 label: "Eventos",
@@ -60,12 +61,12 @@ export default async function DashboardPage() {
               },
               ...(canModerate(user)
                 ? [
-                    {
-                      label: "Pendientes",
-                      value: summary[3] + summary[4],
-                      href: "/dashboard/gestion/moderacion",
-                    },
-                  ]
+                  {
+                    label: "Pendientes",
+                    value: summary[3] + summary[4],
+                    href: "/dashboard/gestion/moderacion",
+                  },
+                ]
                 : []),
             ]}
           />
@@ -80,45 +81,45 @@ export default async function DashboardPage() {
             cards={[
               ...(canCreateContent(user)
                 ? [
-                    {
-                      label: "Eventos",
-                      value: summary?.[1] ?? 0,
-                      href: "/dashboard/gestion/eventos",
-                    },
-                    {
-                      label: "Lugares",
-                      value: summary?.[2] ?? 0,
-                      href: "/dashboard/gestion/lugares",
-                    },
-                  ]
+                  {
+                    label: "Eventos",
+                    value: summary?.[1] ?? 0,
+                    href: "/dashboard/gestion/eventos",
+                  },
+                  {
+                    label: "Lugares",
+                    value: summary?.[2] ?? 0,
+                    href: "/dashboard/gestion/lugares",
+                  },
+                ]
                 : []),
               ...(canManageUsers(user)
                 ? [
-                    {
-                      label: "Categorías",
-                      value: summary?.[5].length ?? 0,
-                      href: "/dashboard/gestion/categorias",
-                    },
-                    {
-                      label: "Usuarios",
-                      value: summary?.[0] ?? 0,
-                      href: "/dashboard/gestion/usuarios",
-                    },
-                    {
-                      label: "Media",
-                      value: summary?.[6].length ?? 0,
-                      href: "/dashboard/gestion/media",
-                    },
-                  ]
+                  {
+                    label: "Categorías",
+                    value: summary?.[5].length ?? 0,
+                    href: "/dashboard/gestion/categorias",
+                  },
+                  {
+                    label: "Usuarios",
+                    value: summary?.[0] ?? 0,
+                    href: "/dashboard/gestion/usuarios",
+                  },
+                  {
+                    label: "Media",
+                    value: summary?.[6].length ?? 0,
+                    href: "/dashboard/gestion/media",
+                  },
+                ]
                 : []),
               ...(canModerate(user)
                 ? [
-                    {
-                      label: "Moderación",
-                      value: (summary?.[3] ?? 0) + (summary?.[4] ?? 0),
-                      href: "/dashboard/gestion/moderacion",
-                    },
-                  ]
+                  {
+                    label: "Moderación",
+                    value: (summary?.[3] ?? 0) + (summary?.[4] ?? 0),
+                    href: "/dashboard/gestion/moderacion",
+                  },
+                ]
                 : []),
             ]}
           />

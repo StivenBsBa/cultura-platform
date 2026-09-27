@@ -6,13 +6,23 @@ import { Button } from "@/components/ui/button";
 import { SearchInput } from "@/components/ui/search-input";
 import { Select } from "@/components/ui/form-field";
 
+type CategoryOption = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
 export function EventFilters({
   search,
   period,
+  category,
+  categories,
   free,
 }: {
   search?: string;
   period?: string;
+  category?: string;
+  categories?: CategoryOption[];
   free: boolean;
 }) {
   return (
@@ -24,7 +34,7 @@ export function EventFilters({
         gridTemplateColumns: {
           xs: "minmax(0, 1fr)",
           sm: "minmax(0, 1fr) minmax(160px, 220px)",
-          md: "minmax(320px, 1fr) 210px auto",
+          md: "minmax(260px, 1fr) 200px 220px auto",
         },
         alignItems: "center",
         gap: 1.25,
@@ -42,6 +52,14 @@ export function EventFilters({
         <MenuItem value="today">Hoy</MenuItem>
         <MenuItem value="weekend">Fin de semana</MenuItem>
         <MenuItem value="next_7_days">7 días</MenuItem>
+      </Select>
+      <Select name="category" defaultValue={category ?? ""} aria-label="Categoría del evento">
+        <MenuItem value="">Todas las categorías</MenuItem>
+        {categories?.map((item) => (
+          <MenuItem key={item.id} value={item.slug}>
+            {item.name}
+          </MenuItem>
+        ))}
       </Select>
       <Box
         sx={{

@@ -2,9 +2,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUploader } from "@/components/admin/image-uploader";
-import { Input } from "@/components/ui/form-field";
+import { FormField, Input } from "@/components/ui/form-field";
 import { Button } from "@/components/ui/button";
-import { Box, Typography } from "@mui/material";
+import { Alert, Box, Typography } from "@mui/material";
 export function ProfileForm({
   id,
   name,
@@ -58,9 +58,9 @@ export function ProfileForm({
       <Typography component="h2" variant="h5">
         Editar información
       </Typography>
-      <Box component="label" sx={{ display: "grid", gap: 0.75, fontWeight: 600 }}>
-        Nombre
+      <FormField label="Nombre" htmlFor="profile-name" hint="Este nombre se mostrará en tu perfil y en tus publicaciones">
         <Input
+          id="profile-name"
           value={currentName}
           onChange={(event) => setName(event.target.value)}
           minLength={2}
@@ -68,9 +68,9 @@ export function ProfileForm({
           required
           autoComplete="name"
         />
-      </Box>
-      <Box>
-        <Typography component="p" sx={{ fontWeight: 600 }}>
+      </FormField>
+      <Box sx={{ display: "grid", gap: 1 }}>
+        <Typography component="p" sx={{ m: 0, fontWeight: 600 }}>
           Avatar{" "}
           <Typography component="span" color="text.secondary">
             (almacenado en RustFS)
@@ -87,11 +87,11 @@ export function ProfileForm({
         )}
       </Box>
       {status && (
-        <Typography component="p" role="status">
+        <Alert severity={status.includes("correctamente") ? "success" : "error"} role="status">
           {status}
-        </Typography>
+        </Alert>
       )}
-      <Button disabled={loading} loading={loading}>
+      <Button type="submit" disabled={loading} loading={loading}>
         Guardar cambios
       </Button>
     </Box>

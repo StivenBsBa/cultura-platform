@@ -21,18 +21,13 @@ export async function SiteHeader() {
     >
       <PageContainer
         sx={{
-          minHeight: 72,
+          minHeight: { xs: 64, md: 72 },
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          gap: 4,
-          "@media (max-width:680px)": {
-            minHeight: 64,
-            alignItems: "flex-start",
-            gap: 1.5,
-            py: 1.5,
-            flexWrap: "wrap",
-          },
+          gap: { xs: 1.5, md: 4 },
+          py: { xs: 1.5, md: 0 },
+          flexWrap: { xs: "wrap", md: "nowrap" },
         }}
       >
         <MuiLink
