@@ -34,4 +34,16 @@ test("alias y rutas protegidas devuelven al login sin sesión", async ({ page })
   }
 });
 
-test.skip("login, crear evento y alternar favoritos requieren base de datos seed disponible", () => {});
+test("login con credenciales reales redirige al dashboard", async ({ page }) => {
+  const email = process.env.E2E_LOGIN_EMAIL;
+  const password = process.env.E2E_LOGIN_PASSWORD;
+
+  test.skip(!email || !password, "Requiere credenciales de prueba configuradas en el entorno.");
+
+  await page.goto("/login");
+  await page.getByLabel("Correo electrónico").fill(email!);
+  await page.getByLabel("Contraseña").fill(password!);
+  await page.getByRole("button", { name: "Ingresar" }).click();
+
+  await expect(page).toHaveURL(/\/dashboard(?:\/|$)/);
+});

@@ -56,6 +56,7 @@ Copie `.env.example`; no suba `.env`.
 | `AUTH_SECRET`                 | Sí                    | Secreto Auth.js                               | `openssl rand -base64 48`                                        |
 | `NEXTAUTH_SECRET`             | No                    | Alternativa con prioridad sobre `AUTH_SECRET` | secreto compatible                                               |
 | `AUTH_URL`                    | Recomendado           | URL usada por layout, sitemap y robots        | `http://localhost:3000`                                          |
+| `NEXTAUTH_URL`                | Sí                    | URL canónica de callbacks de NextAuth.js v4   | igual a `AUTH_URL`                                               |
 | `REDIS_URL`                   | Recomendado           | Caché, rate limits y colas                    | `redis://localhost:6379`                                         |
 | `S3_ENDPOINT`                 | Sí para uploads       | Endpoint servidor → RustFS                    | host: `http://localhost:9000`; Docker: `http://rustfs:9000`      |
 | `S3_PUBLIC_ENDPOINT`          | Sí para URLs firmadas | Endpoint visible para navegador               | `http://localhost:9000`                                          |
@@ -72,7 +73,7 @@ Copie `.env.example`; no suba `.env`.
 | `NODE_ENV`                    | Docker                | Entorno Node                                  | `development` / `production`                                     |
 | `NEXT_DIST_DIR`               | No                    | Directorio de build Next.js                   | sólo si se cambia                                                |
 
-No existen como variables de aplicación `POSTGRES_DB`, `NEXTAUTH_URL`, `RUSTFS_ACCESS_KEY`, `RUSTFS_SECRET_KEY`, `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`. Compose fija la base `cultura_platform` y mapea las credenciales S3 hacia variables internas de RustFS.
+No existen como variables de aplicación `POSTGRES_DB`, `RUSTFS_ACCESS_KEY`, `RUSTFS_SECRET_KEY`, `SENTRY_DSN` ni `NEXT_PUBLIC_SENTRY_DSN`. Compose fija la base `cultura_platform` y mapea las credenciales S3 hacia variables internas de RustFS.
 
 ### Ejemplo .env desde host
 
@@ -82,6 +83,7 @@ POSTGRES_PASSWORD="CAMBIA_ESTE_SECRETO"
 DATABASE_URL="postgresql://cultura:CAMBIA_ESTE_SECRETO@localhost:5432/cultura_platform?schema=public"
 AUTH_SECRET="GENERA_UN_SECRETO_LARGO"
 AUTH_URL="http://localhost:3000"
+NEXTAUTH_URL="http://localhost:3000"
 REDIS_URL="redis://localhost:6379"
 S3_ENDPOINT="http://localhost:9000"
 S3_PUBLIC_ENDPOINT="http://localhost:9000"

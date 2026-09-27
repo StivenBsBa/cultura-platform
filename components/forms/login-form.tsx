@@ -14,29 +14,38 @@ export function LoginForm() {
   const params = useSearchParams();
   const router = useRouter();
   const passwordChanged = params.get("passwordChanged") === "1";
-  async function submit(data: FormData) {
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setLoading(true);
     setError("");
-    const candidate = params.get("callbackUrl") ?? "";
-    const callbackUrl =
-      candidate.startsWith("/") && !candidate.startsWith("//") ? candidate : "/dashboard";
-    const result = await signIn("credentials", {
-      email: data.get("email"),
-      password: data.get("password"),
-      redirect: false,
-      callbackUrl,
-    });
-    setLoading(false);
-    if (result?.error) setError("Correo o contraseña incorrectos.");
-    else {
+    try {
+      const data = new FormData(event.currentTarget);
+      const email = data.get("email");
+      const password = data.get("password");
+      if (typeof email !== "string" || typeof password !== "string") {
+        setError("Ingresa tu correo y contraseña.");
+        return;
+      }
+      const candidate = params.get("callbackUrl") ?? "";
+      const callbackUrl =
+        candidate.startsWith("/") && !candidate.startsWith("//") ? candidate : "/dashboard";
+      const result = await signIn("credentials", { email, password, redirect: false, callbackUrl });
+      if (!result?.ok) {
+        setError("Correo o contraseña incorrectos.");
+        return;
+      }
       router.replace(callbackUrl);
       router.refresh();
+    } catch {
+      setError("No fue posible iniciar sesión. Verifica tu conexión e inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
     }
   }
   return (
     <Box
       component="form"
-      action={submit}
+      onSubmit={submit}
       sx={{
         width: "min(100%, 420px)",
         display: "grid",
@@ -78,7 +87,7 @@ export function LoginForm() {
         </Box>
       </Box>
       {error && <FieldError>{error}</FieldError>}
-      <Button loading={loading}>Ingresar</Button>
+      <Button type="submit" loading={loading}>Ingresar</Button>
       <Typography component="p" color="text.secondary">
         ¿No tienes cuenta? <Link href="/registro">Registrarse</Link>
       </Typography>

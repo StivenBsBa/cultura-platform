@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { CalendarDays, MapPin, Pencil, Shapes, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import { Box, Chip, MenuItem, Paper, Typography } from "@mui/material";
+import { Box, Chip, Divider, MenuItem, Paper, Typography } from "@mui/material";
 import { DetailModal } from "@/components/ui/detail-modal";
 import { ActionGroup } from "@/components/ui/entity-card";
 import { Button } from "@/components/ui/button";
@@ -142,15 +142,15 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
   const scopeLabel = (scope: Category["scope"]) =>
     scopes.find((item) => item.value === scope)?.label;
   return (
-    <Paper component="section" sx={{ p: 2.5, borderRadius: 1.5, boxShadow: 1 }}>
+    <Box component="section">
       <Button type="button" onClick={create}>
         Nueva categoría
       </Button>
       <Box
         sx={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 2,
+          gridTemplateColumns: { xs: "1fr", sm: "repeat(2, minmax(0, 1fr))", xl: "repeat(3, minmax(0, 1fr))" },
+          gap: 2.5,
           mt: 2,
         }}
       >
@@ -162,58 +162,49 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
             tabIndex={0}
             role="button"
             sx={{
-              minHeight: 210,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-              cursor: "pointer",
-              boxShadow: "0 7px 20px rgba(17, 61, 49, 0.06)",
-              "&:hover, &:focus-visible": {
-                borderColor: "#85aa9b",
-                boxShadow: "0 12px 26px rgba(17, 61, 49, 0.12)",
-                outline: "none",
-              },
+            minHeight: 214,
+            p: 0,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+            textAlign: "left",
+            color: "text.primary",
+            bgcolor: "background.paper",
+            borderColor: "#d9e1dc",
+            borderRadius: 1.5,
+            cursor: "pointer",
+            overflow: "hidden",
+            transition: "border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease",
+            "&:hover, &:focus-visible": {
+              borderColor: "secondary.main",
+              boxShadow: 2,
+              transform: "translateY(-2px)",
+            },
             }}
             onClick={() => view(item)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") view(item);
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: 1,
-              }}
-            >
-              <Chip label={scopeLabel(item.scope)} size="small" color="secondary" />
-              <Typography color="text.secondary">
-                {new Intl.DateTimeFormat("es-CO", { dateStyle: "medium" }).format(
-                  new Date(item.createdAt),
-                )}
+            <Box sx={{ width: "100%", p: 2.25, display: "flex", flexDirection: "column", gap: 1.25, flex: 1 }}>
+              <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: "grid", placeItems: "center", width: 38, height: 38, borderRadius: 1.25, bgcolor: "#edf4ef", color: "secondary.main" }}>
+                  {item.scope === "EVENT" ? <CalendarDays size={19} /> : item.scope === "PLACE" ? <MapPin size={19} /> : <Shapes size={19} />}
+                </Box>
+                <Chip label={scopeLabel(item.scope)} size="small" color="secondary" variant="outlined" />
+              </Box>
+              <Typography component="h2" variant="h6" sx={{ m: 0 }}>{item.name}</Typography>
+              <Typography component="p" color="text.secondary" sx={{ m: 0, display: "-webkit-box", overflow: "hidden", WebkitBoxOrient: "vertical", WebkitLineClamp: 2 }}>
+                {item.description || "Explora contenidos culturales relacionados."}
               </Typography>
             </Box>
-            <Typography component="h2" variant="h6">
-              {item.name}
-            </Typography>
-            <Typography component="p" color="text.secondary">
-              {item.description || "Sin descripción"}
-            </Typography>
-            <Typography component="strong" sx={{ mt: "auto", fontWeight: 700 }}>
-              {item._count.events + item._count.places} relacionados
-            </Typography>
+            <Divider flexItem />
             <Box
-              sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}
+              sx={{ width: "100%", px: 2.25, py: 1.5, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 1 }}
               onClick={(event) => event.stopPropagation()}
             >
-              <Button variant="outline" type="button" onClick={() => view(item)}>
-                <Eye size={16} /> Ver
-              </Button>
-              <Button variant="destructive" type="button" onClick={() => void remove(item)}>
-                <Trash2 size={15} /> Eliminar
-              </Button>
+              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>{item._count.events + item._count.places} relacionados</Typography>
+              <Button variant="ghost" size="sm" type="button" onClick={() => void remove(item)} aria-label={`Eliminar ${item.name}`} sx={{ color: "error.main" }}><Trash2 size={17} /></Button>
             </Box>
           </Paper>
         ))}
@@ -326,6 +317,6 @@ export function CategoryManager({ initial }: { initial: Category[] }) {
           )}
         </DetailModal>
       )}
-    </Paper>
+    </Box>
   );
 }
