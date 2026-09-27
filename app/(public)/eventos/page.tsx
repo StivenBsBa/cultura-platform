@@ -1,0 +1,51 @@
+import { EventCard } from "@/components/events/event-card";
+import { EventFilters } from "@/components/events/event-filters";
+import { eventService } from "@/lib/services/event.service";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Box } from "@mui/material";
+import { Typography } from "@mui/material";
+import { PageContainer } from "@/components/ui/page-container";
+import { SlidersHorizontal } from "lucide-react";
+
+export const dynamic = "force-dynamic";
+
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | undefined>>;
+}) {
+  const query = await searchParams;
+  const { data } = await eventService.list({
+    page: 1,
+    pageSize: 20,
+    sort: "upcoming",
+    search: query.search,
+    category: query.category,
+    period: query.period as "today" | "weekend" | "next_7_days" | undefined,
+    free: query.free === "true",
+  });
+  return (
+    <>
+      <PageContainer component="main">
+        <Typography component="h1" variant="h3" sx={{ mb: 2 }}>
+          Eventos culturales
+        </Typography>
+        <EventFilters search={query.search} period={query.period} free={query.free === "true"} />
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 520px), 1fr))",
+            gap: 2,
+          }}
+        >
+          {data.map((event) => (
+            <EventCard key={event.id} event={event} />
+          ))}
+        </Box>
+        {data.length === 0 && (
+          <EmptyState>No hay eventos que coincidan con los filtros.</EmptyState>
+        )}
+      </PageContainer>
+    </>
+  );
+}

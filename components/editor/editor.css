@@ -1,0 +1,30 @@
+.rich-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.6rem;
+}
+.rich-media {
+  margin: 1.25rem auto;
+}
+.rich-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.rich-media--left {
+  margin-left: 0;
+}
+.rich-media--right {
+  margin-right: 0;
+}
+.rich-media--small {
+  max-width: 33%;
+}
+.rich-media--medium {
+  max-width: 66%;
+}
+.rich-media--large,
+.rich-media--full {
+  max-width: 100%;
+}
