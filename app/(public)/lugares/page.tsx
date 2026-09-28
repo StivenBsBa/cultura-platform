@@ -1,5 +1,5 @@
 import { PlaceCard } from "@/components/places/place-card";
-import { PlaceFilters } from "@/components/places/place-filters";
+import { ContentFilters } from "@/components/ui/content-filters";
 import { placeService } from "@/lib/services/place.service";
 import { categoryService } from "@/lib/services/category.service";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -44,13 +44,14 @@ export default async function PlacesPage({
         <Typography component="h1" variant="h3" sx={{ mb: 2 }}>
           Lugares para descubrir
         </Typography>
-        <PlaceFilters
+        <ContentFilters
           search={query.search}
           category={query.category}
           categories={categories}
           lat={query.lat}
           lng={query.lng}
           radius={query.radius}
+          searchPlaceholder="Busca un lugar"
         />
         <Box
           sx={{
